@@ -1,22 +1,16 @@
 const mongoose = require("mongoose");
 
-const userSchema = new mongoose.Schema(
-  {
-    phonenumber: {
-      type: String,
-      required: true,
-      unique: true,
-    },
-    name: {
-      type: String,
-      default: "", // Will be filled after user enters it
-    },
-    classId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Class",
-    },
+const userSchema = new mongoose.Schema({
+  username: { type: String, unique: true },
+  password: { type: String },
+  name: { type: String },
+  classId: { type: mongoose.Schema.Types.ObjectId, ref: "Class" },
+  lastAccessed: {
+    classId: { type: mongoose.Schema.Types.ObjectId, ref: "Class" },
+    subjectId: { type: mongoose.Schema.Types.ObjectId, ref: "Subject" },
+    chapterId: { type: mongoose.Schema.Types.ObjectId, ref: "Chapter" },
+    topicId: { type: mongoose.Schema.Types.ObjectId, ref: "Topic" },
   },
-  { timestamps: true }
-);
+});
 
 module.exports = mongoose.model("User", userSchema);

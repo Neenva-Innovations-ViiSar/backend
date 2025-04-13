@@ -1,34 +1,65 @@
 const Joi = require("joi");
 const jwt = require("jsonwebtoken");
 
+
 const userValidation = (req, res, next) => {
   const schema = Joi.object({
-    phonenumber: Joi.string()
-      .length(10)
-      .pattern(/^[0-9]+$/)
-      .required(),
+    name: Joi.string().required(), // Only validate name for the first step
   });
+
   const { error } = schema.validate(req.body);
   if (error) {
-    return res.status(400).json({ message: "Bad request", error });
+    return res.status(400).json({ message: "Bad request", error: error.details });
   }
   next();
 };
 
-const verifyToken = (req, res, next) => {
-  const bearer = req.headers["authorization"];
-  if (!bearer)
-    return res.status(401).json({ message: "Unauthorized: No token" });
-
-  const token = bearer.split(" ")[1];
-
-  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-    if (err)
-      return res.status(403).json({ message: "Token invalid or expired" });
-
-    req.user = decoded;
-    next();
+const passwordValidation = (req, res, next) => {
+  const schema = Joi.object({
+    userId: Joi.string().required(), // Allowing userId now
+    password: Joi.string().min(6).required()
   });
+
+  const { error } = schema.validate(req.body);
+  if (error) {
+    return res.status(400).json({ message: "Bad request", error: error.details });
+  }
+
+  next();
 };
 
-module.exports = { userValidation, verifyToken };
+const loginValidation = (req, res, next) => {
+  const schema = Joi.object({
+    username: Joi.string().required(),
+    password: Joi.string().min(6).required(),
+  });
+
+  const { error } = schema.validate(req.body);
+  if (error) {
+    return res.status(400).json({ message: "Bad request", error: error.details });
+  }
+  next();
+};
+
+
+function verifyToken(req, res, next) {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "No token provided" });
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded; // this should contain { id: user._id }
+    next();
+  } catch (err) {
+    res.status(401).json({ message: "Invalid token." });
+  }
+}
+
+
+
+module.exports = { userValidation, verifyToken, passwordValidation, loginValidation};
