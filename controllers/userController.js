@@ -130,7 +130,7 @@ async function login(req, res) {
 // Fetch user profile data
 async function userProfile(req, res) {
   try {
-    const user = await User.findById(req.user.id).select("-__v");
+    const user = await User.findById(req.user.id).populate("classId", "name").select("-__v");
     if (!user) return res.status(404).json({ message: "User not found" });
 
     res.status(200).json({
