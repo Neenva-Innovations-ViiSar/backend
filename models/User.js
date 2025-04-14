@@ -6,8 +6,6 @@ const userSchema = new mongoose.Schema({
   name: { type: String },
   classId: { type: mongoose.Schema.Types.ObjectId, ref: "Class" },
   lastAccessed: {
-    classId: { type: mongoose.Schema.Types.ObjectId, ref: "Class" },
-    subjectId: { type: mongoose.Schema.Types.ObjectId, ref: "Subject" },
     chapterId: { type: mongoose.Schema.Types.ObjectId, ref: "Chapter" },
     topicId: { type: mongoose.Schema.Types.ObjectId, ref: "Topic" },
   },
