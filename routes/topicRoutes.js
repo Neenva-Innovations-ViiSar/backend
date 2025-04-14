@@ -6,7 +6,7 @@ const {
 } = require("../controllers/topicController");
 const { verifyToken } = require("../middlewares/authMiddleware");
 
-router.post("/new", verifyToken, createTopic); // create topic
+router.post("/new", createTopic); // create topic
 router.get("/:chapterId", verifyToken, getTopicsByChapter); // get topics by chapter
 
 module.exports = router;

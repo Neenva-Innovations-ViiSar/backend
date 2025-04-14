@@ -6,7 +6,7 @@ const {
 } = require("../controllers/chapterController");
 const { verifyToken } = require("../middlewares/authMiddleware");
 
-router.post("/new", verifyToken, createChapter);
+router.post("/new", createChapter);
 router.get("/:subjectId", verifyToken, getChapterBySubject);
 
 module.exports = router;
