@@ -31,7 +31,7 @@ const passwordValidation = (req, res, next) => {
 const loginValidation = (req, res, next) => {
   const schema = Joi.object({
     username: Joi.string().required(),
-    password: Joi.string().min(6).required(),
+    password: Joi.string().min(4).required(),
   });
 
   const { error } = schema.validate(req.body);
