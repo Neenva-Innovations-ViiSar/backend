@@ -37,7 +37,7 @@ async function getLastVisited(req, res) {
       })
       .populate({
         path: "lastVisited.topicId",
-        select: "_id name",
+        select: "_id name audioUrl",
       })
       .select("lastVisited");
 
