@@ -5,7 +5,7 @@ const userSchema = new mongoose.Schema({
   password: { type: String },
   name: { type: String },
   classId: { type: mongoose.Schema.Types.ObjectId, ref: "Class" },
-  lastAccessed: {
+  lastVisited: {
     chapterId: { type: mongoose.Schema.Types.ObjectId, ref: "Chapter" },
     topicId: { type: mongoose.Schema.Types.ObjectId, ref: "Topic" },
   },
