@@ -2,9 +2,9 @@ const Topic = require("../models/Topic");
 
 const createTopic = async (req, res) => {
   try {
-    const { name, chapterId, audioUrl, sequence } = req.body;
+    const { name, chapterId, audioUrl, sequence, lang } = req.body;
 
-    if (!name || !chapterId || !audioUrl || sequence === undefined) {
+    if (!name || !chapterId || !audioUrl || sequence === undefined || !lang) {
       return res
         .status(400)
         .json({ message: "Name, Chapter ID, audio URL, and sequence are required" });
@@ -14,6 +14,7 @@ const createTopic = async (req, res) => {
       name,
       chapterId,
       audioUrl,
+      lang,
       sequence
     });
 
@@ -24,7 +25,6 @@ const createTopic = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
-
 
 
 const getTopicsByChapter = async (req, res) => {

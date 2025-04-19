@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const topicSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
+    lang: { type: String, required: true },
     audioUrl: { type: String, required: true },
     chapterId: {
       type: mongoose.Schema.Types.ObjectId,

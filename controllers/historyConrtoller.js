@@ -33,7 +33,7 @@ async function getLastVisited(req, res) {
     const user = await User.findById(req.user.id)
       .populate({
         path: "lastVisited.chapterId",
-        select: "_id name", // or whatever fields you want
+        select: "_id name",
       })
       .populate({
         path: "lastVisited.topicId",

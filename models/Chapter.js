@@ -7,6 +7,12 @@ const chapterSchema = new mongoose.Schema({
     ref: "Subject",
     required: true,
   },
+  sequence: [
+    {
+      contentType: { type: String, enum: ['Topic', 'Quiz'], required: true },
+      refId: { type: mongoose.Schema.Types.ObjectId, required: true }
+    }
+  ],
 },{ timestamps: true }
 );
 
