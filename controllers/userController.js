@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const generateToken = require("../utils/generateToken");
 
 // Step 1: Generate unique username
 async function generateUsername(req, res) {
@@ -42,14 +43,16 @@ async function setPassword(req, res) {
     if (!userId || !password)
       return res.status(400).json({ message: "User ID and password required" });
 
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const user = await User.findByIdAndUpdate(userId, { password: hashedPassword }, { new: true });
+    user.password = hashedPassword;
+    await user.save();
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
-    });
+    const token = generateToken(user._id);
 
     res.status(200).json({
       success: true,
@@ -91,7 +94,9 @@ async function login(req, res) {
     const { username, password } = req.body;
 
     if (!username || !password) {
-      return res.status(400).json({ message: "Username and password are required" });
+      return res
+        .status(400)
+        .json({ message: "Username and password are required" });
     }
 
     const user = await User.findOne({ username });
@@ -106,9 +111,7 @@ async function login(req, res) {
       return res.status(401).json({ message: "Invalid password" });
     }
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
-    });
+    const token = generateToken(user._id);
 
     res.status(200).json({
       success: true,
@@ -130,7 +133,9 @@ async function login(req, res) {
 // Fetch user profile data
 async function userProfile(req, res) {
   try {
-    const user = await User.findById(req.user.id).populate("classId", "name").select("-__v");
+    const user = await User.findById(req.user.id)
+      .populate("classId", "name")
+      .select("-__v");
     if (!user) return res.status(404).json({ message: "User not found" });
 
     res.status(200).json({
@@ -142,4 +147,52 @@ async function userProfile(req, res) {
   }
 }
 
-module.exports = { generateUsername, setPassword, userProfile, updateUserProfile, login };
+// PATCH /user/progress
+const updateUserProgress = async (req, res) => {
+  try {
+    const { chapterId, topicId, quizCompleted } = req.body;
+
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const progressEntry = user.progress.find((p) =>
+      p.chapterId.equals(chapterId)
+    );
+
+    if (progressEntry) {
+      if (topicId && !progressEntry.completedTopics.includes(topicId)) {
+        progressEntry.completedTopics.push(topicId);
+      }
+      if (quizCompleted !== undefined) {
+        progressEntry.quizCompleted = quizCompleted;
+      }
+    } else {
+      user.progress.push({
+        chapterId,
+        completedTopics: topicId ? [topicId] : [],
+        quizCompleted: quizCompleted || false,
+      });
+    }
+
+    await user.save();
+
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: "Progress updated",
+        data: user.progress,
+      });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+module.exports = {
+  generateUsername,
+  setPassword,
+  userProfile,
+  updateUserProfile,
+  login,
+  updateUserProgress,
+};

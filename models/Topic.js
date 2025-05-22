@@ -10,6 +10,7 @@ const topicSchema = new mongoose.Schema(
       ref: "Chapter",
       required: true,
     },
+    levelId: { type: mongoose.Schema.Types.ObjectId, ref: 'Level', required: true },
     sequence: { type: Number, required: true } // for sequencing the audio.
   },
   { timestamps: true }

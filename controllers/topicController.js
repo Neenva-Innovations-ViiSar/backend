@@ -1,21 +1,22 @@
 const Topic = require("../models/Topic");
 
+// Create a new topic under a level
 const createTopic = async (req, res) => {
   try {
-    const { name, chapterId, audioUrl, sequence, lang } = req.body;
+    const { name, levelId, audioUrl, sequence, lang } = req.body;
 
-    if (!name || !chapterId || !audioUrl || sequence === undefined || !lang) {
+    if (!name || !levelId || !audioUrl || sequence === undefined || !lang) {
       return res
         .status(400)
-        .json({ message: "Name, Chapter ID, audio URL, and sequence are required" });
+        .json({ message: "Name, Level ID, audio URL, sequence, and language are required" });
     }
 
     const newTopic = new Topic({
       name,
-      chapterId,
+      levelId,
       audioUrl,
       lang,
-      sequence
+      sequence,
     });
 
     await newTopic.save();
@@ -26,12 +27,12 @@ const createTopic = async (req, res) => {
   }
 };
 
-
-const getTopicsByChapter = async (req, res) => {
+// Get all topics under a specific level
+const getTopicsByLevel = async (req, res) => {
   try {
-    const { chapterId } = req.params;
+    const { levelId } = req.params;
 
-    const topics = await Topic.find({ chapterId }).sort({ sequence: 1 });
+    const topics = await Topic.find({ levelId }).sort({ sequence: 1 });
 
     res.status(200).json({ success: true, data: topics });
   } catch (err) {
@@ -39,4 +40,4 @@ const getTopicsByChapter = async (req, res) => {
   }
 };
 
-module.exports = { createTopic, getTopicsByChapter };
+module.exports = { createTopic, getTopicsByLevel };

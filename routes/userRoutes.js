@@ -6,6 +6,7 @@ const {
   updateUserProfile,
   login,
   userProfile,
+  updateUserProgress,
 } = require("../controllers/userController");
 
 const { verifyToken, passwordValidation, loginValidation} = require("../middlewares/authMiddleware");
@@ -21,5 +22,9 @@ router.post("/login", loginValidation, login); // Apply userValidation middlewar
 
 // Get user profile
 router.get("/profile", verifyToken, userProfile);
+
+// User progress - This will allow to update chapters/topics they’ve completed
+router.patch("/progress", verifyToken, updateUserProgress);
+
 
 module.exports = router;
