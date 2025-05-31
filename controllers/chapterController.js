@@ -25,4 +25,21 @@ const getChapterBySubject = async (req, res) => {
   }
 };
 
-module.exports = { createChapter, getChapterBySubject };
+const deleteChapter = async (req, res) => {
+  try {
+    const { chapterId } = req.params;
+
+    const deletedChapter = await Chapter.findByIdAndDelete(chapterId);
+
+    if (!deletedChapter) {
+      return res.status(404).json({ error: "Chapter not found" });
+    }
+
+    res.status(200).json({ success: true, data: deletedChapter });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+
+module.exports = { createChapter, getChapterBySubject, deleteChapter };

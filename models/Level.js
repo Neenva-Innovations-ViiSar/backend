@@ -8,6 +8,12 @@ const levelSchema = new mongoose.Schema({
     quiz: { type: mongoose.Schema.Types.ObjectId, ref: 'Quiz' }, // optional
     isRequired: { type: Boolean, default: true },
   },
+  sequence: [
+    {
+      contentType: { type: String, enum: ["Topic", "Quiz"], required: true },
+      refId: { type: mongoose.Schema.Types.ObjectId, required: true },
+    },
+  ],
 });
 
 module.exports = mongoose.model('Level', levelSchema);
