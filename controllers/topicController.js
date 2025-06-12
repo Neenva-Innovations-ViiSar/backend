@@ -4,16 +4,14 @@ const Topic = require("../models/Topic");
 // Create a new topic or reel
 const createTopic = async (req, res) => {
   try {
-    const { name, levelId, audioUrl, lang, type, voiceGiver } = req.body;
+    const { name, levelId, audioUrl, lang, type, voiceGiver, sequence } = req.body;
 
-    // Default type to 'topic' if not provided
     const contentType = type || 'topic';
 
     if (!name || !audioUrl || !lang) {
       return res.status(400).json({ message: "Name, audio URL, and language are required" });
     }
 
-    // Validation depending on type
     if (contentType === 'topic') {
       if (!levelId || sequence === undefined) {
         return res.status(400).json({ message: "Level ID and sequence are required for topics" });
@@ -26,16 +24,15 @@ const createTopic = async (req, res) => {
       audioUrl,
       type: contentType,
       levelId: contentType === 'topic' ? levelId : undefined,
+      sequence: contentType === 'topic' ? sequence : undefined,
       voiceGiver: contentType === 'reel' ? voiceGiver : undefined,
     });
 
     await newTopic.save();
-    
-    //Add to Level.sequence if it's a topic
+
     if (contentType === 'topic') {
       await Level.findByIdAndUpdate(levelId, {
         $push: {
-          topics: newTopic._id,
           sequence: {
             contentType: "Topic",
             refId: newTopic._id
@@ -49,6 +46,7 @@ const createTopic = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
 
 // Get all topics under a specific level
 const getTopicsByLevel = async (req, res) => {

@@ -30,7 +30,7 @@ app.use("/api/subject", subjectRoutes);
 app.use("/api/chapter", chapterRoutes);
 app.use("/api/topic", topicRoutes);
 app.use("/api/history", historyRoutes);
-app.use("/api/chapters", quizRoutes);
+app.use("/api/quiz", quizRoutes);
 app.use("/api/level", levelRoutes);
 
 app.listen(PORT, () => {

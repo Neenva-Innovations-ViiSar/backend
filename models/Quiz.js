@@ -6,6 +6,12 @@ const quizSchema = new mongoose.Schema({
     ref: 'Chapter',
     required: true
   },
+  
+  levelId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Level',
+    required: true
+  },
 
   question: {
     type: String,
