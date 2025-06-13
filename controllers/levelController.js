@@ -23,7 +23,7 @@ exports.createLevel = async (req, res) => {
 // GET /levels/:chapterId
 exports.getLevelsByChapter = async (req, res) => {
   try {
-    const levels = await Level.find({ chapterId: req.params.chapterId });
+    const levels = await Level.find({ chapterId: req.params.chapterId }).select('levelNumber _id');;
     res.status(200).json({ levels });
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });

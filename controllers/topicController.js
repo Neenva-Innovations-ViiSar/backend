@@ -48,20 +48,24 @@ const createTopic = async (req, res) => {
 };
 
 
-// Get all topics under a specific level
-const getTopicsByLevel = async (req, res) => {
+// Get detail of a topic
+const getTopic = async (req, res) => {
   try {
-    const { levelId } = req.params;
+    const { topicId } = req.params;
 
-    const topics = await Topic.find({ levelId, type: 'topic' }).sort({ sequence: 1 });
+    const topic = await Topic.findById(topicId);
 
-    res.status(200).json({ success: true, data: topics });
+    if (!topic || topic.type !== 'topic') {
+      return res.status(404).json({ success: false, message: 'Topic not found' });
+    }
+
+    res.status(200).json({ success: true, data: topic });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ success: false, error: err.message });
   }
 };
 
-// (Optional) Get all reels
+// Get all reels
 const getReels = async (req, res) => {
   try {
     const reels = await Topic.find({ type: 'reel' }).sort({ createdAt: -1 });
@@ -72,4 +76,4 @@ const getReels = async (req, res) => {
   }
 };
 
-module.exports = { createTopic, getTopicsByLevel, getReels };
+module.exports = { createTopic, getTopic, getReels };

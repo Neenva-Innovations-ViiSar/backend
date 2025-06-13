@@ -2,8 +2,8 @@ const express = require("express");
 const router = express.Router();
 const {
   createTopic,
-  getTopicsByLevel,
   getReels,
+  getTopic,
 } = require("../controllers/topicController");
 const { verifyToken } = require("../middlewares/authMiddleware");
 
@@ -13,8 +13,8 @@ router.post("/new", createTopic);
 // Get all reels
 router.get("/reels", verifyToken, getReels);
 
-// Get all topics for a specific level
-router.get("/:levelId", verifyToken, getTopicsByLevel);
+
+router.get("/:topicId", verifyToken, getTopic);
 
 
 module.exports = router;
