@@ -23,14 +23,14 @@ exports.createLevel = async (req, res) => {
 // GET /levels/:chapterId
 exports.getLevelsByChapter = async (req, res) => {
   try {
-    const levels = await Level.find({ chapterId: req.params.chapterId }).select('levelNumber _id');;
+    const levels = await Level.find({ chapterId: req.params.chapterId });
     res.status(200).json({ levels });
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
 
-exports.getLevelContent = async(req,res)=>{
+exports.getLevelContent = async (req, res) => {
   try {
     const { levelId } = req.params;
 
@@ -43,8 +43,7 @@ exports.getLevelContent = async(req,res)=>{
           const topic = await Topic.findById(item.refId);
           return { contentType: 'Topic', data: topic };
         } else if (item.contentType === 'Quiz') {
-          const quiz = await Quiz.findById(item.refId);
-          return { contentType: 'Quiz', data: quiz };
+          return { contentType: 'Quiz', quizId: item.refId };
         }
       })
     );
@@ -54,3 +53,4 @@ exports.getLevelContent = async(req,res)=>{
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
+

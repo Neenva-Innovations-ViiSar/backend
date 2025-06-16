@@ -3,7 +3,7 @@ const router = express.Router();
 const {
   createTopic,
   getReels,
-  getTopic,
+  getTopicsByLevel,
 } = require("../controllers/topicController");
 const { verifyToken } = require("../middlewares/authMiddleware");
 
@@ -14,7 +14,7 @@ router.post("/new", createTopic);
 router.get("/reels", verifyToken, getReels);
 
 
-router.get("/:topicId", verifyToken, getTopic);
+router.get("/:levelId", verifyToken, getTopicsByLevel);
 
 
 module.exports = router;
