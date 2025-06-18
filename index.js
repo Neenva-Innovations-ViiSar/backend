@@ -13,6 +13,7 @@ const topicRoutes = require("./routes/topicRoutes");
 const historyRoutes = require("./routes/historyRoutes");
 const quizRoutes = require("./routes/quizRoutes");
 const levelRoutes = require("./routes/levelRoutes");
+const audioDiaryRoutes = require("./routes/audioDiaryRoutes");
 
 const PORT = process.env.PORT || 5000;
 
@@ -32,6 +33,7 @@ app.use("/api/topic", topicRoutes);
 app.use("/api/history", historyRoutes);
 app.use("/api/quiz", quizRoutes);
 app.use("/api/level", levelRoutes);
+app.use("/api/audiodiary", audioDiaryRoutes)
 
 app.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
