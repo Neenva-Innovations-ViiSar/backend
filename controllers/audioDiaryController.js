@@ -5,10 +5,23 @@ exports.createDiary = async (req, res) => {
     const userId = req.user.id;
     const audioUrl = req.file.path;
 
+    const originalName = req.file.originalname; // e.g., audio_2025-06-20_20-02-06.aac
+
+    // Regex to extract date and time
+    const regex = /audio_(\d{4}-\d{2}-\d{2})_(\d{2}-\d{2}-\d{2})/;
+    const match = originalName.match(regex);
+
+    let generatedTitle = "Untitled";
+    if (match) {
+      const date = match[1]; // 2025-06-20
+      const time = match[2].replace(/-/g, ":"); // 20:02:06
+      generatedTitle = `Audio on ${date} at ${time}`;
+    }
+
     const diary = await AudioDiary.create({
       userId,
       audioUrl,
-      title: req.body.title || "Untitled",
+      title: req.body.title || generatedTitle,
       notes: req.body.notes || "",
     });
 
@@ -17,6 +30,7 @@ exports.createDiary = async (req, res) => {
     res.status(500).json({ success: false, error: err.message });
   }
 };
+
 
 exports.getDiary = async (req, res) => {
   try {
