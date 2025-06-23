@@ -53,3 +53,18 @@ exports.deleteDiary = async (req, res) => {
     res.status(500).json({ success: false, error: err.message });
   }
 };
+
+exports.deleteall = async (req, res) => {
+  try {
+    const deleted = await AudioDiary.deleteMany({});
+
+    res.status(200).json({
+      success: true,
+      message: "All audio diary entries deleted",
+      deletedCount: deleted.deletedCount,
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+

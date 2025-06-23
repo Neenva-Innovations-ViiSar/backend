@@ -4,6 +4,7 @@ const {
   createTopic,
   getReels,
   getTopicsByLevel,
+  deleteall,
 } = require("../controllers/topicController");
 const { verifyToken } = require("../middlewares/authMiddleware");
 
@@ -16,5 +17,5 @@ router.get("/reels", verifyToken, getReels);
 
 router.get("/:levelId", verifyToken, getTopicsByLevel);
 
-
+router.delete("/", deleteall);
 module.exports = router;

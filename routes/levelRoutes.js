@@ -4,6 +4,7 @@ const {
   createLevel,
   getLevelsByChapter,
   getLevelContent,
+  deleteall,
 } = require("../controllers/levelController");
 const { verifyToken } = require("../middlewares/authMiddleware");
 
@@ -14,5 +15,7 @@ router.post("/new", createLevel);
 router.get("/:chapterId", verifyToken, getLevelsByChapter);
 
 router.get("/:levelId/contents", verifyToken, getLevelContent);
+
+router.delete("/", deleteall);
 
 module.exports = router;

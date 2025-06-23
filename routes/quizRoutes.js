@@ -14,4 +14,6 @@ router.put('/:levelId/quizzes/:quizId', quizController.updateQuiz);
 // Route: DELETE /:levelId/quizzes/:quizId
 router.delete('/:levelId/quizzes/:quizId', quizController.deleteQuiz);
 
+router.delete("/", quizController.deleteall);
+
 module.exports = router;

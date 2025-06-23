@@ -26,4 +26,18 @@ const getSubjectsByClass = async (req, res) => {
   }
 };
 
-module.exports = { createSubject, getSubjectsByClass };
+const deleteall = async (req, res) => {
+  try {
+    const deleted = await Subject.deleteMany({});
+
+    res.status(200).json({
+      success: true,
+      message: "All subject entries deleted",
+      deletedCount: deleted.deletedCount,
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+module.exports = { createSubject, getSubjectsByClass, deleteall };

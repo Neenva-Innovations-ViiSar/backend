@@ -5,5 +5,5 @@ const { verifyToken } = require("../middlewares/authMiddleware");
 
 router.post("/new",createClass);// admin will have access for making class
 router.get("/",verifyToken, getAllClasses);// when taking class input from user.
-
+// router.delete("/", deleteall);
 module.exports = router;

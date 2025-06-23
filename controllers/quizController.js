@@ -124,3 +124,17 @@ exports.deleteQuiz = async (req, res) => {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
+
+exports.deleteall = async (req, res) => {
+  try {
+    const deleted = await Quiz.deleteMany({});
+
+    res.status(200).json({
+      success: true,
+      message: "All quiz entries deleted",
+      deletedCount: deleted.deletedCount,
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
