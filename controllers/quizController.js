@@ -1,6 +1,7 @@
 const Quiz = require("../models/Quiz");
 const Level = require("../models/Level");
 const Chapter = require("../models/Chapter");
+const User = require("../models/User");
 
 // POST /api/quiz/:levelId/quizzes/new
 exports.addQuiz = async (req, res) => {
@@ -64,7 +65,7 @@ exports.getQuizzes = async (req, res) => {
 
 exports.submitQuiz = async (req, res) => {
   try {
-    const { userId } = req.user;
+    const { id } = req.user;
     const { levelId } = req.params;
     const { answers } = req.body; // Array of { quizId, selectedAnswer }
 
@@ -85,7 +86,7 @@ exports.submitQuiz = async (req, res) => {
 
     const percentage = (obtainedPoints / totalPoints) * 100;
 
-    const user = await User.findById(userId);
+    const user = await User.findById(id );
     if (!user) return res.status(404).json({ message: "User not found" });
 
     let progressEntry = user.progress.find(p => p.levelId.toString() === levelId);

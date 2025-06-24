@@ -23,10 +23,11 @@ exports.createLevel = async (req, res) => {
 exports.getLevelsByChapter = async (req, res) => {
   try {
     const { chapterId } = req.params;
-    const { userId } = req.user;
+    const { id  } = req.user;
 
     const levels = await Level.find({ chapterId }).sort({ levelNumber: 1 });
-    const user = await User.findById(userId);
+    const user = await User.findById(id);
+    if (!user) return res.status(404).json({ message: "User not found" });
 
     const response = levels.map(level => {
       const progress = user.progress.find(p => p.levelId.toString() === level._id.toString());
