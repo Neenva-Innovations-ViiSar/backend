@@ -41,5 +41,19 @@ const deleteChapter = async (req, res) => {
   }
 };
 
+const deleteall = async (req, res) => {
+  try {
+    const deleted = await Chapter.deleteMany({});
 
-module.exports = { createChapter, getChapterBySubject, deleteChapter };
+    res.status(200).json({
+      success: true,
+      message: "All subject entries deleted",
+      deletedCount: deleted.deletedCount,
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+
+module.exports = { createChapter, getChapterBySubject, deleteChapter, deleteall };

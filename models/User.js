@@ -10,21 +10,15 @@ const userSchema = new mongoose.Schema({
     topicId: { type: mongoose.Schema.Types.ObjectId, ref: "Topic" },
   },
   progress: [
-    {
-      chapterId: { type: mongoose.Schema.Types.ObjectId, ref: "Chapter" },
-      completedTopics: [{ type: mongoose.Schema.Types.ObjectId, ref: "Topic" }],
-
-      completedQuizzes: [
-        {
-          quizId: { type: mongoose.Schema.Types.ObjectId, ref: "Quiz" },
-          score: { type: Number }, 
-          completedAt: { type: Date },
-        },
-      ],
-
-      unlockedAt: { type: Date, default: Date.now },
-    },
-  ],
+  {
+    chapterId: { type: mongoose.Schema.Types.ObjectId, ref: "Chapter" },
+    levelId: { type: mongoose.Schema.Types.ObjectId, ref: "Level" },
+    isUnlocked: { type: Boolean, default: false },
+    isCompleted: { type: Boolean, default: false },
+    score: { type: Number, default: 0 },
+    unlockedAt: { type: Date, default: Date.now },
+  },
+],
 });
 
 module.exports = mongoose.model("User", userSchema);

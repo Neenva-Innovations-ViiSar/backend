@@ -8,14 +8,12 @@ exports.addQuiz = async (req, res) => {
     const { levelId } = req.params;
     const { question, options, correctAnswer, points } = req.body;
 
-    // Validate required fields
     if (!question || !options || !correctAnswer) {
       return res.status(400).json({
         message: "Missing required fields: question, options, correctAnswer",
       });
     }
 
-    // Find the level to get the chapterId
     const level = await Level.findById(levelId);
     if (!level) return res.status(404).json({ message: "Level not found" });
 
@@ -32,7 +30,6 @@ exports.addQuiz = async (req, res) => {
 
     await newQuiz.save();
 
-    // Update Level.sequence
     await Level.findByIdAndUpdate(levelId, {
       $push: {
         sequence: {
@@ -64,35 +61,87 @@ exports.getQuizzes = async (req, res) => {
   }
 };
 
-// PUT /api/quiz/:levelId/quizzes/:quizId
-exports.updateQuiz = async (req, res) => {
+
+exports.submitQuiz = async (req, res) => {
   try {
-    const { levelId, quizId } = req.params;
+    const { userId } = req.user;
+    const { levelId } = req.params;
+    const { answers } = req.body; // Array of { quizId, selectedAnswer }
 
     const level = await Level.findById(levelId);
     if (!level) return res.status(404).json({ message: "Level not found" });
 
-    const quiz = await Quiz.findById(quizId);
-    if (!quiz) return res.status(404).json({ message: "Quiz not found" });
+    const quizzes = await Quiz.find({ levelId });
+    let totalPoints = 0;
+    let obtainedPoints = 0;
 
-    if (quiz.chapterId.toString() !== level.chapterId.toString()) {
-      return res
-        .status(403)
-        .json({ message: "Quiz does not belong to this level's chapter" });
+    quizzes.forEach((quiz) => {
+      totalPoints += quiz.points;
+      const userAnswer = answers.find(a => a.quizId === quiz._id.toString());
+      if (userAnswer && userAnswer.selectedAnswer === quiz.correctAnswer) {
+        obtainedPoints += quiz.points;
+      }
+    });
+
+    const percentage = (obtainedPoints / totalPoints) * 100;
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    let progressEntry = user.progress.find(p => p.levelId.toString() === levelId);
+
+    if (progressEntry) {
+      progressEntry.isCompleted = true;
+      progressEntry.score = obtainedPoints;
+    } else {
+      user.progress.push({
+        chapterId: level.chapterId,
+        levelId: levelId,
+        isUnlocked: true,
+        isCompleted: true,
+        score: obtainedPoints
+      });
     }
 
-    quiz.question = req.body.question || quiz.question;
-    quiz.options = req.body.options || quiz.options;
-    quiz.correctAnswer = req.body.correctAnswer || quiz.correctAnswer;
-    quiz.points = req.body.points ?? quiz.points;
+    // Unlock next level if passing criteria met
+    if (percentage >= 60) { 
+      const nextLevel = await Level.findOne({
+        chapterId: level.chapterId,
+        levelNumber: level.levelNumber + 1
+      });
 
-    await quiz.save();
+      if (nextLevel) {
+        let nextProgress = user.progress.find(p => p.levelId.toString() === nextLevel._id.toString());
+        if (nextProgress) {
+          nextProgress.isUnlocked = true;
+        } else {
+          user.progress.push({
+            chapterId: nextLevel.chapterId,
+            levelId: nextLevel._id,
+            isUnlocked: true,
+            isCompleted: false,
+            score: 0
+          });
+        }
+      }
+    }
 
-    res.status(200).json({ message: "Quiz updated", quiz });
+    await user.save();
+
+    res.status(200).json({
+      message: "Quiz submitted",
+      obtainedPoints,
+      totalPoints,
+      percentage,
+      nextLevelUnlocked: percentage >= 60
+    });
+
   } catch (err) {
+    console.log(err);
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
+
 
 // DELETE /api/quiz/:levelId/quizzes/:quizId
 exports.deleteQuiz = async (req, res) => {

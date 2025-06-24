@@ -4,11 +4,12 @@ const {
   createChapter,
   getChapterBySubject,
   deleteChapter,
+  deleteall,
 } = require("../controllers/chapterController");
 const { verifyToken } = require("../middlewares/authMiddleware");
 
 router.post("/new", createChapter);
 router.get("/:subjectId", verifyToken, getChapterBySubject);
 router.delete("/delete/:chapterId", deleteChapter);
-
+router.delete("/", deleteall);
 module.exports = router;

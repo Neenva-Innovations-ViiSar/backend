@@ -23,34 +23,27 @@ exports.createLevel = async (req, res) => {
 // GET /levels/:chapterId
 exports.getLevelsByChapter = async (req, res) => {
   try {
-    const levels = await Level.find({ chapterId: req.params.chapterId });
-    res.status(200).json({ levels });
+    const { chapterId } = req.params;
+    const { userId } = req.user;
+
+    const levels = await Level.find({ chapterId }).sort({ levelNumber: 1 });
+    const user = await User.findById(userId);
+
+    const response = levels.map(level => {
+      const progress = user.progress.find(p => p.levelId.toString() === level._id.toString());
+      return {
+        _id: level._id,
+        levelNumber: level.levelNumber,
+        isUnlocked: progress?.isUnlocked || (level.levelNumber === 1), // First level always unlocked
+        isCompleted: progress?.isCompleted || false,
+        score: progress?.score || 0
+      };
+    });
+
+    res.status(200).json({ levels: response });
+
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
-  }
-};
-
-exports.getLevelContent = async (req, res) => {
-  try {
-    const { levelId } = req.params;
-
-    const level = await Level.findById(levelId);
-    if (!level) return res.status(404).json({ message: 'Level not found' });
-
-    const populatedSequence = await Promise.all(
-      level.sequence.map(async (item) => {
-        if (item.contentType === 'Topic') {
-          const topic = await Topic.findById(item.refId);
-          return { contentType: 'Topic', data: topic };
-        } else if (item.contentType === 'Quiz') {
-          return { contentType: 'Quiz', quizId: item.refId };
-        }
-      })
-    );
-
-    res.status(200).json({ success: true, sequence: populatedSequence });
-  } catch (err) {
-    res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
 
