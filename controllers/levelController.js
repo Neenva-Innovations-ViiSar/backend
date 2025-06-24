@@ -1,7 +1,6 @@
 const Level = require("../models/Level");
 const Chapter = require("../models/Chapter");
-const Topic = require("../models/Topic");
-const Quiz = require("../models/Quiz");
+const User = require("../models/User");
 
 // POST /levels/new
 exports.createLevel = async (req, res) => {
