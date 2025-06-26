@@ -67,26 +67,14 @@ exports.submitQuiz = async (req, res) => {
   try {
     const { id } = req.user;
     const { levelId } = req.params;
-    const { answers } = req.body; // Array of { quizId, selectedAnswer }
+    const { obtainedPoints, totalPoints } = req.body;
 
     const level = await Level.findById(levelId);
     if (!level) return res.status(404).json({ message: "Level not found" });
 
-    const quizzes = await Quiz.find({ levelId });
-    let totalPoints = 0;
-    let obtainedPoints = 0;
-
-    quizzes.forEach((quiz) => {
-      totalPoints += quiz.points;
-      const userAnswer = answers.find(a => a.quizId === quiz._id.toString());
-      if (userAnswer && userAnswer.selectedAnswer === quiz.correctAnswer) {
-        obtainedPoints += quiz.points;
-      }
-    });
-
     const percentage = (obtainedPoints / totalPoints) * 100;
 
-    const user = await User.findById(id );
+    const user = await User.findById(id);
     if (!user) return res.status(404).json({ message: "User not found" });
 
     let progressEntry = user.progress.find(p => p.levelId.toString() === levelId);
@@ -104,8 +92,9 @@ exports.submitQuiz = async (req, res) => {
       });
     }
 
-    // Unlock next level if passing criteria met
-    if (percentage >= 60) { 
+    let nextLevelUnlocked = false;
+
+    if (percentage >= 50) {
       const nextLevel = await Level.findOne({
         chapterId: level.chapterId,
         levelNumber: level.levelNumber + 1
@@ -124,17 +113,18 @@ exports.submitQuiz = async (req, res) => {
             score: 0
           });
         }
+        nextLevelUnlocked = true;
       }
     }
 
     await user.save();
 
     res.status(200).json({
-      message: "Quiz submitted",
+      message: "Quiz submitted successfully",
       obtainedPoints,
       totalPoints,
       percentage,
-      nextLevelUnlocked: percentage >= 60
+      nextLevelUnlocked
     });
 
   } catch (err) {
