@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const Chapter = require("../models/Chapter");
 
 const createChapter = async (req, res) => {
@@ -55,5 +56,40 @@ const deleteall = async (req, res) => {
   }
 };
 
+// delete one by Id 
+const deleteById = async (req, res) => {
+  try {
+    const { chapterId } = req.params;
 
-module.exports = { createChapter, getChapterBySubject, deleteChapter, deleteall };
+    if (!mongoose.isValidObjectId(chapterId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid ID format",
+      });
+    }
+
+    const deleted = await Chapter.findByIdAndDelete(chapterId);
+
+    if (!deleted) {
+      return res.status(404).json({
+        success: false,
+        message: "Chapter not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Chapter deleted",
+      deleted,
+    });
+    
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      error: err.message,
+    });
+  }
+};
+
+
+module.exports = { createChapter, getChapterBySubject, deleteChapter, deleteall, deleteById };

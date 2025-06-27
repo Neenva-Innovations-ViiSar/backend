@@ -4,6 +4,7 @@ const {
   createLevel,
   getLevelsByChapter,
   deleteall,
+  deleteById,
 } = require("../controllers/levelController");
 const { verifyToken } = require("../middlewares/authMiddleware");
 
@@ -12,6 +13,8 @@ router.post("/new", createLevel);
 
 // Get all levels under a specific chapter
 router.get("/:chapterId", verifyToken, getLevelsByChapter);
+
+router.delete("/:leveld/delete", deleteById);
 
 router.delete("/", deleteall);
 

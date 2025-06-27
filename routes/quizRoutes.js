@@ -16,6 +16,9 @@ router.post("/:levelId/submit", verifyToken, quizController.submitQuiz);
 // Route: DELETE /:levelId/quizzes/:quizId
 router.delete('/:levelId/quizzes/:quizId', quizController.deleteQuiz);
 
+router.delete("/:quizId/delete", quizController.deleteById);
+
 router.delete("/", quizController.deleteall);
+
 
 module.exports = router;

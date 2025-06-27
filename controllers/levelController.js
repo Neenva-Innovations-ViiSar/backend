@@ -1,6 +1,7 @@
 const Level = require("../models/Level");
 const Chapter = require("../models/Chapter");
 const User = require("../models/User");
+const mongoose = require("mongoose");
 
 // POST /levels/new
 exports.createLevel = async (req, res) => {
@@ -61,4 +62,40 @@ exports.deleteall = async (req, res) => {
     res.status(500).json({ success: false, error: err.message });
   }
 };
+
+
+exports.deleteById = async (req, res) => {
+  try {
+    const { leveld } = req.params;
+
+    if (!mongoose.isValidObjectId(leveld)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid ID format",
+      });
+    }
+
+    const deleted = await Level.findByIdAndDelete(leveld);
+
+    if (!deleted) {
+      return res.status(404).json({
+        success: false,
+        message: "Level not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Level deleted",
+      deleted,
+    });
+    
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      error: err.message,
+    });
+  }
+};
+
 

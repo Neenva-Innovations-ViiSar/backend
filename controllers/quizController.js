@@ -1,7 +1,7 @@
 const Quiz = require("../models/Quiz");
 const Level = require("../models/Level");
-const Chapter = require("../models/Chapter");
 const User = require("../models/User");
+const mongoose = require("mongoose");
 
 // POST /api/quiz/:levelId/quizzes/new
 exports.addQuiz = async (req, res) => {
@@ -54,7 +54,7 @@ exports.getQuizzes = async (req, res) => {
     const level = await Level.findById(levelId);
     if (!level) return res.status(404).json({ message: "Level not found" });
 
-    const quizzes = await Quiz.find({ chapterId: level.chapterId });
+    const quizzes = await Quiz.find({ levelId });
 
     res.status(200).json({ quizzes });
   } catch (err) {
@@ -176,5 +176,40 @@ exports.deleteall = async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+// delete one by ID
+exports.deleteById = async (req, res) => {
+  try {
+    const { quizId } = req.params;
+
+    if (!mongoose.isValidObjectId(quizId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid ID format",
+      });
+    }
+
+    const deleted = await Quiz.findByIdAndDelete(quizId);
+
+    if (!deleted) {
+      return res.status(404).json({
+        success: false,
+        message: "Quiz not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Quiz deleted",
+      deleted,
+    });
+    
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      error: err.message,
+    });
   }
 };
